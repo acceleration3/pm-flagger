@@ -35,7 +35,7 @@ namespace PMFlagger
 
         private void MainForm_Load(object sender, EventArgs e)
         {
-            
+            /*
             Console.WriteLine("Please wait while proxies are loaded and checked....");
             GetProxies getProxies = new GetProxies();
             proxyList = getProxies.LoadProxies();
@@ -54,8 +54,12 @@ namespace PMFlagger
                 }
                 ++i;
             }
-
+            
             Console.WriteLine("[Finished Loading] {0} proxies are alive.", getProxies.CountAlive(proxyList));
+            */
+
+            ChatangoAccount testacc = new ChatangoAccount("-snip-", "-snip-", new SocksProxy.Proxy("46.4.88.203", "9050", SocksProxy.ProxyType.SOCKS5));
+
         }
     }
 }
