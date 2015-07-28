@@ -25,7 +25,7 @@ namespace PMFlagger
     public partial class MainForm : Form
     {
         private List<SocksProxy.Proxy> proxyList;
-        private List<ChatangoSocksClient> clients = new List<ChatangoSocksClient>();
+        private List<ChatangoAccount> accounts = new List<ChatangoAccount>();
 
         public MainForm()
         {
@@ -57,8 +57,7 @@ namespace PMFlagger
             
             Console.WriteLine("[Finished Loading] {0} proxies are alive.", getProxies.CountAlive(proxyList));
             */
-
-            ChatangoAccount testacc = new ChatangoAccount("-snip-", "-snip-", new SocksProxy.Proxy("46.4.88.203", "9050", SocksProxy.ProxyType.SOCKS5));
+            ChatangoAccount testacc = new ChatangoAccount("-snip-", "-snip-", new SocksProxy.Proxy("59.58.162.141", "2699", SocksProxy.ProxyType.SOCKS5));
 
         }
     }

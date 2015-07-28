@@ -60,14 +60,22 @@ public class ChatangoSocksClient : SocksProxySocket.Proxy
     {
         if(!success || data == null)
         {
-            Console.WriteLine("The attempt to get an AuthID for " + this.account.ToString() + "failed.");
+            Console.WriteLine("The login POST request for the account " + this.account.ToString() + " failed.");
             return;
         }
 
         this.authid = Regex.Match(data, @"auth.chatango.com=(.*?);").Groups[1].Value;
-        this.state = CHATANGO_STATE.AUTHED;
 
-        this.Connect("c1.chatango.com", 5222);
+        if(authid != null && authid != string.Empty)
+        {
+            this.state = CHATANGO_STATE.AUTHED;
+            this.Connect("c1.chatango.com", 5222);
+        }
+        else
+        {
+            Console.WriteLine("The attempt to get an AuthID for the account " + this.account.ToString() + " failed.");
+            return;
+        }
     }
 
     private void OnRecieve(SocksProxySocket.Proxy p, byte[] data)
@@ -78,7 +86,7 @@ public class ChatangoSocksClient : SocksProxySocket.Proxy
     private void OnConnect(SocksProxySocket.Proxy p)
     {
         state = CHATANGO_STATE.LOGGEDIN;
-        this.Send("tlogin:" + authid + ":2:9254476157467996\0");
+        this.Send("tlogin:" + authid + ":2\0");
     }
 
 
