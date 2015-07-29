@@ -32,10 +32,11 @@ public static class SocksProxy
             isAlive = false;
         }
 
+        // format for db
         public override string ToString()
         {
-            return String.Format("[{0}] {1}:{2}", (proxyType == ProxyType.SOCKS4 ? "SOCKS4" : "SOCKS5"), ip.ToString(), port);
-        }
+            return string.Format("{0}:{1}:{2}", (proxyType == ProxyType.SOCKS4 ? "SOCKS4" : "SOCKS5"), ip.ToString(), port);
+        }       
     }
 
     public class ProxyComparer : IEqualityComparer<Proxy>
