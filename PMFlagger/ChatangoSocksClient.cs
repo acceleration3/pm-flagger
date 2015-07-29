@@ -16,9 +16,10 @@ public class ChatangoSocksClient : SocksProxySocket.Proxy
 {
     public enum CHATANGO_STATE
     {
+        CLOSED,
         UNAUTHED,
         AUTHED,
-        LOGGEDIN
+        LOGGEDIN,
     }
 
     private string authid = string.Empty;
@@ -180,5 +181,6 @@ public class ChatangoSocksClient : SocksProxySocket.Proxy
     private void ChOnClose()
     {
         Debug.Print("CLOSED CONNECTION TO CHATANGO SERVER");
+        this.chatangoState = CHATANGO_STATE.CLOSED;
     }
 }
