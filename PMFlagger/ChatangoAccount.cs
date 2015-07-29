@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace PMFlagger
 {
-    public class ChatangoAccount
+    public class ChatangoAccount : ICloneable
     {
         public string username;
         public string password;
@@ -19,8 +19,10 @@ namespace PMFlagger
             this.proxy = proxy;            
             // assume the account exists 
             this.exists = true;
+            this.username = username;
+            this.password = password;
 
-            if (this.username == null)
+            if (username == null)
             {
                 this.password = GeneratePassword();
                 this.username = GenerateUsername();
@@ -46,9 +48,8 @@ namespace PMFlagger
         {
             string[] names = {"Jackson", "Aiden", "Liam", "Lucas", "Noah", "Mason", "Ethan", "Caden", "Jacob", "Logan", "Jayden", "Elijah", "Jack", "Luke", "Michael", "Benjamin", "Alexander", "James", "Jayce", "Caleb", "Connor", "William", "Carter", "Ryan", "Oliver", "Matthew", "Daniel", "Gabriel", "Henry", "Owen", "Grayson", "Dylan", "Landon", "Isaac", "Nicholas", "Wyatt", "Nathan", "Andrew", "Cameron", "Dominic", "Joshua", "Eli", "Sebastian", "Hunter", "Brayden", "David", "Samuel", "Evan", "Gavin", "Christian", "Max", "Anthony", "Joseph", "Julian", "John", "Colton", "Levi", "Muhammad", "Isaiah", "Aaron", "Tyler", "Charlie", "Adam", "Parker", "Austin", "Thomas", "Zachary", "Nolan", "Alex", "Ian", "Jonathan", "Christopher", "Cooper", "Hudson", "Miles", "Adrian", "Leo", "Blake", "Lincoln", "Jordan", "Tristan", "Jason", "Josiah", "Xavier", "Camden", "Chase", "Declan", "Carson", "Colin", "Brody", "Asher", "Jeremiah", "Micah", "Easton", "Xander", "Ryder", "Nathaniel", "Elliot", "Sean", "Cole"};
             Random rand = new Random();
-            int name1 = rand.Next(names.Length);
-            int name2 = rand.Next(names.Length);
-            return names[name1].ToLower() + names[name2].ToLower() + GenerateRandomString(rand.Next(3, 5));
+            int index = rand.Next(names.Length);           
+            return names[index].ToLower() + GenerateRandomString(rand.Next(5, 7));
         }
 
         private string GeneratePassword()
@@ -59,6 +60,18 @@ namespace PMFlagger
         public string GenerateEmail()
         {
             return GenerateRandomString(16, true) + "@" + GenerateRandomString(8, true) + "." + GenerateRandomString(8, true);
+        }
+
+        public object Copy()
+        {
+            return this;
+        }
+
+        public object Clone()
+        {
+            return new ChatangoAccount(username,
+                password,
+                (SocksProxy.Proxy)this.proxy.Clone());
         }
     }
 }

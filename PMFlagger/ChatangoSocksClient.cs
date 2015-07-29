@@ -93,8 +93,16 @@ public class ChatangoSocksClient : SocksProxySocket.Proxy
 
         this.authid = Regex.Match(data, @"auth.chatango.com=(.*?);").Groups[1].Value;
 
-        if(authid != string.Empty)
+        if(this.authid != string.Empty)
         {
+            if( !this.account.exists )
+            {
+                // it exists now
+                this.account.exists = true;
+                Database.Add(this.account);
+                Console.WriteLine("Created account successfully... " + this.account.username);
+            }
+
             this.chatangoState = CHATANGO_STATE.AUTHED;
             this.Connect("c1.chatango.com", 443);
         }

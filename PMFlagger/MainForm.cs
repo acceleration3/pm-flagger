@@ -57,8 +57,22 @@ namespace PMFlagger
             
             Console.WriteLine("[Finished Loading] {0} proxies are alive.", getProxies.CountAlive(proxyList));
             */
+
             SocksProxy.Proxy p = new SocksProxy.Proxy("59.58.162.141", "2699", SocksProxy.ProxyType.SOCKS5);
-            ChatangoAccount testacc = new ChatangoAccount(null, null, p);
+            Dictionary<string, ChatangoAccount> db = Database.Get();
+            ChatangoAccount testacc;
+
+            if( db.ContainsKey(p.ToString()) )
+            {                
+                testacc = db[p.ToString()];
+                Console.WriteLine("Loaded account from db: " + testacc.username);
+            }
+            else
+            {
+                testacc = new ChatangoAccount(null, null, p);
+                Console.WriteLine("Trying to create account: " + testacc.username);
+            }
+            
             ChatangoSocksClient testclient = new ChatangoSocksClient(testacc);
         }
     }

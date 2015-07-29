@@ -16,7 +16,7 @@ public static class SocksProxy
         SOCKS5,
     }
 
-    public class Proxy
+    public class Proxy : ICloneable
     {
         public IPAddress ip { get; set; }
         public int port { get; set; }
@@ -32,11 +32,29 @@ public static class SocksProxy
             isAlive = false;
         }
 
+        public Proxy(IPAddress _ip, int _port, ProxyType _proxyType)
+        {
+            ip = _ip;
+            port = _port;
+            proxyType = _proxyType;
+            isAlive = false;
+        }
+
         // format for db
         public override string ToString()
         {
-            return string.Format("{0}:{1}:{2}", (proxyType == ProxyType.SOCKS4 ? "SOCKS4" : "SOCKS5"), ip.ToString(), port);
-        }       
+            return string.Format("{0}:{1}:{2}", ip.ToString(), port, proxyType.ToString());
+        }     
+  
+        public object Copy()
+        {
+            return this;
+        }
+
+        public object Clone()
+        {
+            return new Proxy(this.ip, this.port, this.proxyType);            
+        }
     }
 
     public class ProxyComparer : IEqualityComparer<Proxy>

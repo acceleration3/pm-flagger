@@ -64,6 +64,8 @@
   <ItemGroup>
     <Compile Include="ChatangoAccount.cs" />
     <Compile Include="ChatangoSocksClient.cs" />
+    <Compile Include="Database.cs" />
+    <Compile Include="DictionaryExtensions.cs" />
     <Compile Include="GetProxies.cs" />
     <Compile Include="HTTP.cs" />
     <Compile Include="MainForm.cs">
