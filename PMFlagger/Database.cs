@@ -37,6 +37,7 @@ namespace PMFlagger
                 else
                 {
                     db = new Dictionary<string, ChatangoAccount>();
+                    Initialized = true;
                 }
                
                 try
