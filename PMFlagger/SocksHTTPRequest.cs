@@ -86,6 +86,8 @@ public class SocksHTTPRequest
 
         private void myOnReceiveCallback(SocksProxySocket.Proxy p, byte[] data)
         {
+            Close(false);
+
             if (data != null)
             {
                 onCompletionCallback(true, Encoding.ASCII.GetString(data));

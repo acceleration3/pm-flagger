@@ -266,7 +266,9 @@ public class SocksProxySocket
                 int bytesRead = clientSocket.EndReceive(ar);
                 if (bytesRead > 0)
                 {
-                    HandleRecv(state.buffer);
+                    byte[] data = new byte[bytesRead];
+                    Array.Copy(state.buffer, data, bytesRead);
+                    HandleRecv(data);
                 }
                 else if (bytesRead == 0)
                 {
@@ -294,12 +296,12 @@ public class SocksProxySocket
             }
         }
 
-        public void Close()
+        public void Close(bool doCallback = true)
         {
             try
             {
                 clientSocket.Close();
-                if (onCloseCallback != null)
+                if (doCallback && onCloseCallback != null)
                     onCloseCallback();
             }
             catch (Exception)
