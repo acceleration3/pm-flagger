@@ -298,6 +298,8 @@ public class SocksProxySocket
 
         public void Close(bool doCallback = true)
         {
+            state = SocketState.CLOSED;
+            
             try
             {
                 clientSocket.Close();
@@ -310,7 +312,6 @@ public class SocksProxySocket
 
             clientSocket = null;
             isConnected = false;
-            state = SocketState.CLOSED;
         }
     }
 }
