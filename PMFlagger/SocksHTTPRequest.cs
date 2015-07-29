@@ -88,6 +88,9 @@ public class SocksHTTPRequest
         {
             Close(false);
 
+            if (onCompletionCallback == null)
+                return;
+
             if (data != null)
             {
                 onCompletionCallback(true, Encoding.ASCII.GetString(data));
@@ -106,7 +109,8 @@ public class SocksHTTPRequest
 
         private void myOnCloseCallback()
         {
-            onCompletionCallback(false, null);
+            if(onCompletionCallback != null)
+                onCompletionCallback(false, null);
         }
 
     }

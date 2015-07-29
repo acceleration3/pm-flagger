@@ -18,13 +18,13 @@ public class ChatangoSocksClient : SocksProxySocket.Proxy
     {
         CLOSED,
         UNAUTHED,
-        AUTHED,
-        LOGGEDIN,
+        READY,
+        FLAGGED,
     }
 
     private string authid = string.Empty;
     private ChatangoAccount account;
-    private SocksHTTPRequest.Post authRequest;
+    private SocksHTTPRequest.Post httpPost;
     private string incompletePacketData;
     public CHATANGO_STATE chatangoState = CHATANGO_STATE.UNAUTHED;
 
@@ -32,10 +32,9 @@ public class ChatangoSocksClient : SocksProxySocket.Proxy
     {
         this.incompletePacketData = "";
         this.account = account;
-        this.authRequest = new SocksHTTPRequest.Post("chatango.com", this.account.proxy, new SocksHTTPRequest.Post.onCompletion(OnRecieveAuth));
-
+        
         onReceiveCallback = ChOnRecieve;
-        onConnectCallback = ChOnConnect;
+        //onConnectCallback = ChOnConnect;
         onCloseCallback = ChOnClose;
 
         if (this.account.exists)
@@ -48,28 +47,35 @@ public class ChatangoSocksClient : SocksProxySocket.Proxy
         }
     }
 
+    public override string ToString()
+    {
+        return string.Format("[{1}]{0}", new object[] { this.account.username, this.chatangoState.ToString() });
+    }
+
     private void GetAuthID()
     {
+        this.httpPost = new SocksHTTPRequest.Post("chatango.com", this.account.proxy, new SocksHTTPRequest.Post.onCompletion(OnRecieveAuth));
+
         Dictionary<string, string> postData = new Dictionary<string, string>();
-        Dictionary<string, string> headers;
+        Dictionary<string, string> headers = httpPost.GetHeaders();
 
         postData["user_id"] = this.account.username;
         postData["password"] = this.account.password;
         postData["storecookie"] = "on";
         postData["checkerrors"] = "yes";
 
-        headers = authRequest.GetHeaders();
         headers["Cache-Control"] = "max-age=0";
         headers["Origin"] = "http://chatango.com";
         headers["Referer"] = "http://chatango.com/login";
 
-        this.authRequest.StartRequest("login", headers, postData);
+        this.httpPost.StartRequest("login", headers, postData);
     }
 
     private void CreateAccount()
     {
+        this.httpPost = new SocksHTTPRequest.Post("chatango.com", this.account.proxy, OnAccountCreate);
         Dictionary<string, string> postData = new Dictionary<string,string>();
-        Dictionary<string, string> headers = authRequest.GetHeaders();
+        Dictionary<string, string> headers = httpPost.GetHeaders();
 
         string email = this.account.GenerateEmail();        
 
@@ -81,7 +87,60 @@ public class ChatangoSocksClient : SocksProxySocket.Proxy
         postData["signupsubmit"] = "Sign up";
         postData["checkerrors"] = "yes";
 
-        this.authRequest.StartRequest("signupdir", headers, postData);
+        this.httpPost.StartRequest("signupdir", headers, postData);
+    }
+
+    public void FlagUser(string username)
+    {
+        this.httpPost = new SocksHTTPRequest.Post("chatango.com", this.account.proxy, new SocksHTTPRequest.Post.onCompletion(OnFlag));
+        Dictionary<string, string> postData = new Dictionary<string, string>();
+        Dictionary<string, string> headers = httpPost.GetHeaders();
+        Dictionary<string, string> cookies = new Dictionary<string,string>();
+
+        postData["t"] = this.authid;
+        postData["sid"] = username;
+        
+        cookies["auth.chatango.com"] = this.authid;
+        cookies["cookies_enabled.chatango.com"] = "yes";
+        cookies["id.chatango.com"] = this.account.username;
+        cookies["fph.chatango.com"] = "http";
+
+        headers["Referer"] = "http://st.chatango.com/flash/SellersApp.swf";
+        headers["Origin"] = "http://st.chatango.com";
+
+        this.httpPost.StartRequest("iflag", headers, postData, cookies);
+    }
+
+    private void OnFlag(bool success, string data)
+    {
+        if (!success || data == null)
+        {
+            Console.WriteLine("The flag POST request for the account " + this.account.ToString() + " failed.");
+            return;
+        }
+
+        if(data.Contains("flagged"))
+        {
+            Console.WriteLine(this.account.ToString() + " successfully reported the account.");
+            this.chatangoState = CHATANGO_STATE.FLAGGED;
+        }
+        else
+        {
+            Console.WriteLine("The attempt to flag with the account " + this.account.ToString() + " failed.");
+            return;
+        }
+    }
+
+    private void OnAccountCreate(bool success, string data)
+    {
+        if (!this.account.exists)
+        {
+            // it exists now
+            this.account.exists = true;
+            Database.Add(this.account);
+            Console.WriteLine("Created account successfully... " + this.account.username);
+            GetAuthID();
+        }
     }
 
     private void OnRecieveAuth(bool success, string data)
@@ -96,23 +155,15 @@ public class ChatangoSocksClient : SocksProxySocket.Proxy
 
         if(this.authid != string.Empty)
         {
-            if( !this.account.exists )
-            {
-                // it exists now
-                this.account.exists = true;
-                Database.Add(this.account);
-                Console.WriteLine("Created account successfully... " + this.account.username);
-            }
-
-            this.chatangoState = CHATANGO_STATE.AUTHED;
-            this.Connect("c1.chatango.com", 443);
+            //No need to login ?
+            this.chatangoState = CHATANGO_STATE.READY;
         }
         else
         {
             Console.WriteLine("The attempt to get an AuthID for the account " + this.account.ToString() + " failed.");
             return;
         }
-    }       
+    }
 
     private void ChSendPacket(params string[] packets)
     {
@@ -171,12 +222,14 @@ public class ChatangoSocksClient : SocksProxySocket.Proxy
 
     }
 
+    /*
     private void ChOnConnect(SocksProxySocket.Proxy p)
     {
         Debug.Print("CONNECTED TO CHATANGO SERVER WITH " + p.ToString());
-        chatangoState = CHATANGO_STATE.LOGGEDIN;       
+        chatangoState = CHATANGO_STATE;       
         this.ChSendPacket("tlogin", authid, "2");
     }
+    */
 
     private void ChOnClose()
     {

@@ -13,6 +13,7 @@ namespace PMFlagger
         public SocksProxy.Proxy proxy;
         public ChatangoSocksClient client;
         public bool exists;
+        private static Random random = new Random((int)DateTime.Now.Ticks);
 
         public ChatangoAccount(string username, string password, SocksProxy.Proxy proxy)
         {            
@@ -32,7 +33,7 @@ namespace PMFlagger
 
         public override string ToString()
         {
-            return string.Format("{0}:{1}@({2})", new object[] { this.username , this.password, this.proxy.ToString() });
+            return string.Format("{0}:{1}({2})", new object[] { this.username , this.password, this.proxy.ToString() });
         }
 
         private string GenerateRandomString(int n, bool onlyAlpha = false)
@@ -40,16 +41,14 @@ namespace PMFlagger
             string data = "abcdefghijklmnopqrstuvwxyz";
             if (!onlyAlpha)
                 data += "0123456789";
-            Random rand = new Random();
-            return new string(data.OrderBy(x => rand.Next()).Take(n).ToArray());
+            return new string(data.OrderBy(x => random.Next()).Take(n).ToArray());
         }
 
         private string GenerateUsername()
         {
             string[] names = {"Jackson", "Aiden", "Liam", "Lucas", "Noah", "Mason", "Ethan", "Caden", "Jacob", "Logan", "Jayden", "Elijah", "Jack", "Luke", "Michael", "Benjamin", "Alexander", "James", "Jayce", "Caleb", "Connor", "William", "Carter", "Ryan", "Oliver", "Matthew", "Daniel", "Gabriel", "Henry", "Owen", "Grayson", "Dylan", "Landon", "Isaac", "Nicholas", "Wyatt", "Nathan", "Andrew", "Cameron", "Dominic", "Joshua", "Eli", "Sebastian", "Hunter", "Brayden", "David", "Samuel", "Evan", "Gavin", "Christian", "Max", "Anthony", "Joseph", "Julian", "John", "Colton", "Levi", "Muhammad", "Isaiah", "Aaron", "Tyler", "Charlie", "Adam", "Parker", "Austin", "Thomas", "Zachary", "Nolan", "Alex", "Ian", "Jonathan", "Christopher", "Cooper", "Hudson", "Miles", "Adrian", "Leo", "Blake", "Lincoln", "Jordan", "Tristan", "Jason", "Josiah", "Xavier", "Camden", "Chase", "Declan", "Carson", "Colin", "Brody", "Asher", "Jeremiah", "Micah", "Easton", "Xander", "Ryder", "Nathaniel", "Elliot", "Sean", "Cole"};
-            Random rand = new Random();
-            int index = rand.Next(names.Length);           
-            return names[index].ToLower() + GenerateRandomString(rand.Next(5, 7));
+            int index = random.Next(names.Length);
+            return names[index].ToLower() + GenerateRandomString(random.Next(5, 7));
         }
 
         private string GeneratePassword()

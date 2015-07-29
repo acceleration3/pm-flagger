@@ -33,6 +33,7 @@ public class SocksProxySocket
         private HostStruct hs = null;
         public bool isConnected { get; set; }
         public SocketState state { get; set; }
+        private Object recvLock = new Object();
 
         // delegates
         public delegate void onConnect(Proxy p);
@@ -264,6 +265,7 @@ public class SocksProxySocket
             {
                 StateObject state = (StateObject)ar.AsyncState;
                 int bytesRead = clientSocket.EndReceive(ar);
+
                 if (bytesRead > 0)
                 {
                     byte[] data = new byte[bytesRead];

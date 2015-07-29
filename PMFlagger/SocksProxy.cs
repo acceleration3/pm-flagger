@@ -23,6 +23,7 @@ public static class SocksProxy
         public ProxyType proxyType { get; set; }
         public bool isAlive { get; set; }
 
+
         public Proxy(string _ip, string _port, ProxyType _proxyType)
         {
             ip = IPAddress.Parse(_ip);
